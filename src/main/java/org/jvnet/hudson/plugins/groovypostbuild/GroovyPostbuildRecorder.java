@@ -39,8 +39,10 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,12 +70,12 @@ public class GroovyPostbuildRecorder extends Recorder implements MatrixAggregata
 		private final BuildListener listener;
 		private final Result scriptFailureResult;
 		private final Set<AbstractBuild<?, ?>> builds = new HashSet<AbstractBuild<?,?>>();
-		private EnvVars envVars;
+		private Map<String,String> envVars;
 
 		public BadgeManager(AbstractBuild<?, ?> build, BuildListener listener, Result scriptFailureResult) {
 			setBuild(build);
 			try {
-				this.envVars = build.getEnvironment(listener);
+				this.envVars = Collections.unmodifiableMap(build.getEnvironment(listener));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace(listener.getLogger());
@@ -84,8 +86,8 @@ public class GroovyPostbuildRecorder extends Recorder implements MatrixAggregata
 			this.scriptFailureResult = scriptFailureResult;
 		}
 
-        // TBD: @Whitelisted
-		public EnvVars getEnvVars(){
+		@Whitelisted
+		public Map<String,String> getEnvVars(){
 			return this.envVars;
 		}
 
